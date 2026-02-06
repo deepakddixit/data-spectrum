@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: data-spectrum-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - metadata_data:/data
+      - user_data:/app/data
+    environment:
+      - METADATA_TTL=86400
+      - DISCOVERY_TTL=3600
+      - PYTHONUNBUFFERED=1
+
+  generator:
+    build: .
+    command: python utils/generate_tpcds.py --sf 0.01 --out /app/data/tpcds --db /app/data/sample_tpcds.tiny.duckdb
+    volumes:
+      - user_data:/app/data
+    profiles: [ "tools" ]
+
+volumes:
+  metadata_data:
+  user_data:
